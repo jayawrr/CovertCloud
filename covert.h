@@ -2,9 +2,27 @@
 #ifndef COVERT_H
 #define COVERT_H
 
-void bit_timer_isr( int sig );
-void covert_start();
-int covert_phy_bit( int threshold );
+/**
+    Timer interrupt service routine. Raises flag indicating timer reached.
+*/
+void bit_timer_isr();
 
+/**
+    Attempts to write to disk within given threshold of time (useconds).
+    Returns 1 if time taken is longer than threshold, 0 otherwise. 
+*/
+int covert_read_bit( int threshold );
+
+/**
+    Returns that amount of time (useconds) to write to a file.
+*/
+long covert_read_time();
+
+/**
+    Write to disk for given period of time.
+    value: Bit value
+    period: Amount of time to write (useconds).
+*/
+void covert_write_bit( int value, int period );
 
 #endif
