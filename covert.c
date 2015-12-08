@@ -65,7 +65,7 @@ int covert_read_bit( int threshold )
        timer, bit_timer_isr will be called and the flag will be set. */
     /* Open file for writing, clear any existing content, create if necessary */
     if ( flag ) goto FINISH_READ;
-    if ( (file = open( WRITE_FILE, O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP )) < 0 )
+    if ( (file = open( WRITE_FILE, O_WRONLY|O_TRUNC|O_CREAT|O_DIRECT|O_SYNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP )) < 0 )
     {
         if ( errno == EINTR ) goto FINISH_READ;
         perror( "covert_read_bit: fopen error" );
