@@ -65,7 +65,7 @@ int covert_read_bit( long threshold )
        timer, bit_timer_isr will be called and the flag will be set. */
     /* Open file for writing, clear any existing content, create if necessary */
     if ( flag ) goto FINISH_READ;
-    if ( (file = open( WRITE_FILE, O_WRONLY|O_TRUNC|O_CREAT|O_DIRECT|O_SYNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP )) < 0 )
+    if ( (file = open( WRITE_FILE, O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP )) < 0 )
     {
         if ( errno == EINTR ) goto FINISH_READ;
         perror( "covert_read_bit: fopen error" );
@@ -138,19 +138,19 @@ FINISH_READ:
 long covert_read_time()
 {
     int             file, num;
-    struct timeval  sstart, end;
+    struct timeval  start, end;
     long            elapsed;
-    clock_t         start;
+    clock_t         clock_start;
 
     /* Get start time */
-/*    if( gettimeofday( &start, NULL ) < 0 )
+    if( gettimeofday( &start, NULL ) < 0 )
     {
         perror( "covert_read_time: gettimeofday error" );
         exit(1);
     }
-*/
-    start = clock();
 
+/*    clock_start = clock();
+*/
     /* Open file for writing, clear any existing content, create if necessary */
     if ( (file = open( WRITE_FILE, O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP )) < 0 )
     {
@@ -175,17 +175,18 @@ long covert_read_time()
     }
 
     /* Get end time */
-/*    if( gettimeofday( &end, NULL ) < 0 )
+    if( gettimeofday( &end, NULL ) < 0 )
     {
         perror( "covert_read_time: gettimeofday error" );
         exit(1);
     }
-*/
+
     /* Calculate elapsed time */
-/*    elapsed = (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
-*/
-    start = clock() - start;
-    return start;/*elapsed;*/
+    elapsed = (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
+
+/*    clock_start = clock() - clock_start;
+    return clock_start;
+*/    return elapsed;
 }
 
 
