@@ -13,12 +13,13 @@
 #include "covert.h"
 
 #define WRITE_FILE      "./file.txt"
-#define WRITE_STRING    "This string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\nThis string is 25 bytes.\n"
-#define WRITE_LEN       strlen(WRITE_STRING)
 #define TIMER           ITIMER_REAL
 #define TIMER_SIGNAL    SIGALRM
 
+#define WRITE_LEN 1048
+
 volatile sig_atomic_t flag;
+static char buf[WRITE_LEN];
 
 /**
     Timer interrupt service routine. Raises flag indicating timer reached.
@@ -65,7 +66,11 @@ int covert_read_bit( long threshold )
        timer, bit_timer_isr will be called and the flag will be set. */
     /* Open file for writing, clear any existing content, create if necessary */
     if ( flag ) goto FINISH_READ;
+<<<<<<< HEAD
     if ( (file = open( WRITE_FILE, O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP )) < 0 )
+=======
+    if ( (file = open( WRITE_FILE, O_WRONLY|O_TRUNC|O_CREAT|O_SYNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP )) < 0 )
+>>>>>>> 351988aebe8933b0b4ec867647b724d0389cc90c
     {
         if ( errno == EINTR ) goto FINISH_READ;
         perror( "covert_read_bit: fopen error" );
@@ -76,7 +81,7 @@ int covert_read_bit( long threshold )
     while ( num < WRITE_LEN )
     {
         if ( flag ) goto FINISH_READ;
-        if ( (num += write( file, WRITE_STRING, WRITE_LEN-num )) < 0 )
+        if ( (num += write( file, buf, WRITE_LEN-num )) < 0 )
         {
             if ( errno == EINTR ) goto FINISH_READ;
             perror( "covert_read_bit: fwrite error" );
@@ -161,7 +166,7 @@ long covert_read_time()
     num = 0;
     while ( num < WRITE_LEN )
     {
-        if ( (num += write( file, WRITE_STRING, WRITE_LEN-num )) < 0 )
+        if ( (num += write( file, buf, WRITE_LEN-num )) < 0 )
         {
             perror( "covert_read_time: fwrite error" );
             exit(1);
@@ -256,7 +261,7 @@ void covert_write_bit( int value, long period )
             while ( num < WRITE_LEN )
             {
                 if ( flag ) goto FINISH_WRITE;
-                if ( (num += write( file, WRITE_STRING, WRITE_LEN-num )) < 0 )
+                if ( (num += write( file, buf, WRITE_LEN-num )) < 0 )
                 {
                     if ( errno == EINTR ) goto FINISH_WRITE;
                     perror( "covert_write_bit: fwrite error" );

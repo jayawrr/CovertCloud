@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -c -ansi -g
+CFLAGS = -c -g
 
 all: covert_client covert_server covert_tester
 
