@@ -25,38 +25,30 @@ int main( int argc, char *argv[] )
         perror( "covert_read_time: gettimeofday error" );
         exit(1);
     }
-    while(1)
-    {
-	    int bit = 1;
-	    /* Get start time */
-	    if( gettimeofday( &start, NULL ) < 0 )
-	    {
-		perror( "covert_read_time: gettimeofday error" );
-		exit(1);
-	    }
-	while(1)
-	{
-	    long ret = covert_read_time();
-//printf("%ld\n", ret);
-	    if (ret > THRESHOLD) { bit = 0;}
-//		printf("larger\n");} else {
-//printf("smaller\n");}
+    while(1) {
+        int bit = 1;
+        /* Get start time */
+        if( gettimeofday( &start, NULL ) < 0 ) {
+            perror( "covert_read_time: gettimeofday error" );
+            exit(1);
+	}
+	while(1) {
+            long ret = covert_read_time();
+            if (ret > THRESHOLD) { bit = 0;}
 	    
-	    /* Get end time */
-	    if( gettimeofday( &end, NULL ) < 0 )
-	    {
-		perror( "covert_read_time: gettimeofday error" );
-		exit(1);
-	    }
-usleep(10000); // TODO: hacked in from covert_test, is this neccessary?
-	    /* Calculate elapsed time */
-	    //TODO (At what point would this overflow?)
-	    elapsed = (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
- 	   if(elapsed > PERIOD) { break;}
-
-
+            /* Get end time */
+            if( gettimeofday( &end, NULL ) < 0 )
+            {
+                perror( "covert_read_time: gettimeofday error" );
+                exit(1);
+            }
+            usleep(10000); // TODO: hacked in from covert_test, is this neccessary?
+            /* Calculate elapsed time */
+            elapsed = (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
+            if(elapsed > PERIOD) { 
+                break;
+            }
         }
-
 	printf("%d\n",bit); 
     }
 return 0;
