@@ -16,7 +16,7 @@
 #define TIMER           ITIMER_REAL
 #define TIMER_SIGNAL    SIGALRM
 
-#define WRITE_LEN 1048
+#define WRITE_LEN  104857
 
 volatile sig_atomic_t flag;
 static char buf[WRITE_LEN];
@@ -133,6 +133,7 @@ FINISH_READ:
 }
 
 
+
 /**
     Returns that amount of time (useconds) to write to a file.
 */
@@ -183,6 +184,7 @@ long covert_read_time()
     }
 
     /* Calculate elapsed time */
+    //TODO (At what point would this overflow?)
     elapsed = (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
 
 /*    clock_start = clock() - clock_start;
