@@ -6,6 +6,7 @@
 
 #define THRESHOLD   10000
 #define PERIOD 	    2000000
+#define SAMP_PERIOD 1500000
 
 void gettime(struct timeval *t) {
   if( gettimeofday( t, NULL ) < 0 )
@@ -17,11 +18,11 @@ void gettime(struct timeval *t) {
 
 int main( int argc, char *argv[] )
 {
-  struct timeval  l_start, h_start, h_end, curr, threshold, diff;
+  struct timeval  l_start, h_start, h_end, curr, samp_period, diff;
   long            elapsed;
   int prev_bit = 0;
-  threshold.tv_sec = 0;
-  threshold.tv_usec = THRESHOLD;
+  samp_period.tv_sec = 0;
+  samp_period.tv_usec = SAMP_PERIOD;
 
   // Initialize our start times:
   gettime(&l_start);
@@ -41,7 +42,7 @@ int main( int argc, char *argv[] )
     if(bit && prevbit == 0) {
       // Case: rising edge
       timersub(&curr, &l_start, &diff); 
-      if(timercmp(&diff, &threshold, >)) {
+      if(timercmp(&diff, &samp_period, >)) {
         // The rising edge end signals the end of a series of 0 bits.
         if(timercmp(&h_end, &h_start, !=)) {
           // We also use this opportunity to print out the series of 1 bits
