@@ -5,7 +5,8 @@
 #include "covert.h"
 
 #define THRESHOLD   7500
-#define PERIOD 	    2000000
+#define PERIOD_SEC  2
+#define PERIOD_USEC 0
 // length of time of consecutive low reads which mark the end of 1 bits.
 // data has show to be biased to 0s, therefore try to counteract
 // the bias.
@@ -21,6 +22,21 @@ void gettime(struct timeval *t) {
 
 int series_length(struct timeval *t) {
  
+}
+
+// Moves any time that is in excess of a multiplier of the PERIOD from source
+// to dest.
+// This is usefull for measurements which bias towards source.
+// For e.g, the data often shows: period = 2, dest = 1.6, source = 2.4
+// this will set dest = (2.4 - 2) + 1.6 =2 and set source = 2
+void balance_timing(struct timeval *dest, struct timeval *source) {
+  struct timeval period;
+  struct timeval excess;
+  period.tv_sec = PERIOD_SEC;
+  period.tv_usec = PERIOD_USEC;
+  timersub(source, &period, &excess); 
+  //TODO don't assume excess is positive. Data shows almost always postive so ok.
+  timeradd(&excess, dest, dest);
 }
 
 int main( int argc, char *argv[] )
@@ -59,6 +75,9 @@ int main( int argc, char *argv[] )
           // We also use this opportunity to print out the series of 1 bits
           // that preceded this series of 0 bits.
           timersub(&h_end, &h_start, &h_diff);
+          balance_timing(&h_diff, &h_diff);
+
+          
           printf("h_diff: %ld\n", h_diff.tv_sec);
           printf("h_diff: %ld\n", h_diff.tv_usec);
         }
