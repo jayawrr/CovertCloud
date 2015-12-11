@@ -46,14 +46,16 @@ int main( int argc, char *argv[] )
       timersub(&curr, &l_start, &diff); 
       if(timercmp(&diff, &samp_period, >)) {
         // The rising edge end signals the end of a series of 0 bits.
+        
         if(timercmp(&h_end, &h_start, !=)) {
           // We also use this opportunity to print out the series of 1 bits
           // that preceded this series of 0 bits.
           timersub(&h_end, &h_end, &diff);
           printf("%ld\n", diff.tv_usec);
-          gettime(&h_start);
-          h_end = h_start;
         }
+        // Reset high_start time
+        gettime(&h_start);
+        // print the series of 0 bits.
         timersub(&curr, &l_start, &diff); 
         printf("%ld\n", diff.tv_usec);
       } 
