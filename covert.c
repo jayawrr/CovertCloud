@@ -139,38 +139,34 @@ void covert_write_bit( int value, long period )
     {
         if ( flag ) goto FINISH_WRITE;
 
-        /* For 0 bit, write to disk; For 1 bit, wait. */
-        if( !value )
+        /* Open file for writing, clear any existing content, create if necessary */
+        if ( (file = open( WRITE_FILE, O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP )) < 0 )
         {
-            /* Open file for writing, clear any existing content, create if necessary */
-            if ( (file = open( WRITE_FILE, O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP )) < 0 )
-            {
-                if ( errno == EINTR ) goto FINISH_WRITE;
-                perror( "covert_write_bit: fopen error" );
-                exit(1);
-            }
-            /* Write to file */
-            num = 0;
-            while ( num < WRITE_LEN_SEND )
-            {
-                if ( flag ) goto FINISH_WRITE;
-                if ( (num += write( file, buf, WRITE_LEN_SEND-num )) < 0 )
-                {
-                    if ( errno == EINTR ) goto FINISH_WRITE;
-                    perror( "covert_write_bit: fwrite error" );
-                    exit(1);
-                }
-            }
-            /* Flush write */
-            if ( flag ) goto FINISH_WRITE;
-            if ( close( file ) < 0 )
-            {
-                if ( errno == EINTR ) goto FINISH_WRITE;
-                perror( "covert_write_bit: close error" );
-                exit(1);
-            }
-            file = 0;
+            if ( errno == EINTR ) goto FINISH_WRITE;
+            perror( "covert_write_bit: fopen error" );
+            exit(1);
         }
+        /* Write to file */
+        num = 0;
+        while ( num < WRITE_LEN_SEND )
+        {
+            if ( flag ) goto FINISH_WRITE;
+            if ( (num += write( file, buf, WRITE_LEN_SEND-num )) < 0 )
+            {
+                if ( errno == EINTR ) goto FINISH_WRITE;
+                perror( "covert_write_bit: fwrite error" );
+                exit(1);
+            }
+        }
+        /* Flush write */
+        if ( flag ) goto FINISH_WRITE;
+        if ( close( file ) < 0 )
+        {
+            if ( errno == EINTR ) goto FINISH_WRITE;
+            perror( "covert_write_bit: close error" );
+            exit(1);
+        }
+        file = 0;
 
     }
 
