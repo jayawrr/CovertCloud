@@ -1,18 +1,21 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "covert.h"
 
 int main( int argc, char *argv[] )
 {
     int i, value;
+    srand(time(NULL));
 
     value = 0;
 
-    for( i = 0; i < 100; i++ )
+    for( i = 0; i < 1000; i++ )
     {
-        covert_write_bit( value ^= 1, 2050000 );
+	value = rand() % 2;
+        covert_write_bit( value, 2000000 );
         printf( "%d\n", value );
    }
 
