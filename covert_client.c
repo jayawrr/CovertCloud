@@ -1,76 +1,66 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "sys/time.h"
 
 #include "covert.h"
 
 #define THRESHOLD   10000
-#define SAMPLES     1
 #define PERIOD 	    2000000
-#if PERIOD < (THRESHOLD*SAMPLES)
-// I forget what's the actual way to assert something, this
-//works for now
-exit
-#endif
+
+void gettime(struct timeval *t) {
+  if( gettimeofday( t, NULL ) < 0 )
+  {
+      perror( "gettimeofday error" );
+      exit(1);
+  }
+}
 
 int main( int argc, char *argv[] )
 {
-    int i, mode, time[SAMPLES];
-    struct timeval  start, end;
-    long            elapsed;
-    clock_t         clock_start;
+  struct timeval  l_start, h_start, h_end, curr, threshold, diff;
+  long            elapsed;
+  int prev_bit = 0;
+  threshold.tv_sec = 0;
+  threshold.tv_usec = THRESHOLD;
 
-    /* Get start time */
-    if( gettimeofday( &start, NULL ) < 0 )
-    {
-        perror( "covert_read_time: gettimeofday error" );
-        exit(1);
+  // Initialize our start times:
+  gettime(&l_start);
+  h_start = l_start;
+  h_end = l_start;
+
+  int bit = 0;
+  int prevbit = 0;
+  // Signal parsing loop:
+  while(1) {
+    // Time a read:
+    long ret = covert_read_time();
+    if (ret > THRESHOLD) {
+      bit = 1;
     }
-    while(1) {
-        int bit = 1;
-        /* Get start time */
-        if( gettimeofday( &start, NULL ) < 0 ) {
-            perror( "covert_read_time: gettimeofday error" );
-            exit(1);
-	}
-	while(1) {
-            long ret = covert_read_time();
-            if (ret > THRESHOLD) { bit = 0;}
-	    
-            /* Get end time */
-            if( gettimeofday( &end, NULL ) < 0 )
-            {
-                perror( "covert_read_time: gettimeofday error" );
-                exit(1);
-            }
-            usleep(10000); // TODO: hacked in from covert_test, is this neccessary?
-            /* Calculate elapsed time */
-            elapsed = (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
-            if(elapsed > PERIOD) { 
-                break;
-            }
+    gettime(&curr);
+    if(bit && prevbit == 0) {
+      // Case: rising edge
+      timersub(&curr, &l_start, &diff); 
+      if(timercmp(&diff, &threshold, >)) {
+        // The rising edge end signals the end of a series of 0 bits.
+        if(timercmp(&h_end, &h_start, !=)) {
+          // We also use this opportunity to print out the series of 1 bits
+          // that preceded this series of 0 bits.
+          timersub(&h_end, &h_end, &diff);
+          printf("%ld\n", diff.tv_usec);
+          gettime(&h_start);
+          h_end = h_start;
         }
-	printf("%d\n",bit); 
+        timersub(&curr, &l_start, &diff); 
+        printf("%ld\n", diff.tv_usec);
+      } 
+    } else if(!bit && prevbit == 1) {
+      // Case: falling edge
+      gettime(&h_end);
+      l_start = h_end;
     }
-return 0;
-
-#if 0
-    while(1)
-    {
-        mode = 0;
-        for( i = 0; i < SAMPLES; i++ )
-        {
-            time[i] = covert_read_bit( THRESHOLD );
-            mode += time[i];
-            /*printf( "%d\n", time );
-            fflush(NULL);
-            usleep( 10000 );*/
-        }
-        mode /= SAMPLES/2+1;
-        printf( "%d\n", mode );
-        fflush(NULL);
-        usleep(PERIOD-SAMPLES*THRESHOLD);
-    }
-
-    return 0;
-#endif
+    usleep(10000); // To prevent overburdenning the channel from this end.
+    prevbit = bit;
+  } //end while
+  return 0;
 }
