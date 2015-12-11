@@ -50,7 +50,7 @@ int main( int argc, char *argv[] )
         if(timercmp(&h_end, &h_start, !=)) {
           // We also use this opportunity to print out the series of 1 bits
           // that preceded this series of 0 bits.
-          timersub(&h_end, &h_end, &diff);
+          timersub(&h_end, &h_start, &diff);
           printf("h_diff: %ld\n", diff.tv_usec);
         }
         // Reset high_start time
