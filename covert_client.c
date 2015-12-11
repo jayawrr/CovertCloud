@@ -102,15 +102,10 @@ int main( int argc, char *argv[] )
           // We also use this opportunity to print out the series of 1 bits
           // that preceded this series of 0 bits.
           timersub(&h_end, &h_start, &h_diff);
-
-          printf("old_hdiff: %ld\n", h_diff.tv_sec);
-          printf("old_hdiff: %ld\n", h_diff.tv_usec);
-        printf("l_diff: %ld\n", l_diff.tv_sec);
-        printf("l_diff: %ld\n", l_diff.tv_usec);
-          
+          // Ther's a small bias towards l_diff
+          // balance_timing tries to balance things out a little.
           balance_timing(&h_diff, &l_diff);
-          printf("h_diff: %ld\n", h_diff.tv_sec);
-          printf("h_diff: %ld\n", h_diff.tv_usec);
+
           length = series_length(&h_diff);
           for (count = 0; count < length; count++) {
             printf("1\n");
