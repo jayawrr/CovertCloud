@@ -10,7 +10,8 @@
 // length of time of consecutive low reads which mark the end of 1 bits.
 // data has show to be biased to 0s, therefore try to counteract
 // the bias.
-#define SAMP_PERIOD 2300000
+#define SAMP_PERIOD_SEC 1
+#define SAMP_PERIOD_USEC 900000
 
 void gettime(struct timeval *t) {
   if( gettimeofday( t, NULL ) < 0 )
@@ -24,16 +25,17 @@ void gettime(struct timeval *t) {
 // Round up for 1s
 // Roudn down for 0s
 time_t series_length(struct timeval *t, int value) {
-// Ideally we would do division between timeval, but let's not bother for this.
-// Ugh, instead for now let's do the following:
-// With a period of 2 seconds, a samp_period of 2.3 seconds, 0bit periods 
-// very rarely go over 3 seconds, and 1 bit periods rarely go under 2 seconds.
-// Let's just round anything over 1 second up to two seconds, and round down
-// anything under 1 seconds.
-  time_t mod = t->tv_sec % PERIOD_SEC;
-  time_t ret = (t->tv_sec - mod) / PERIOD_SEC;
-  if (mod > 1 && value) {
+  //time_t mod = t->tv_sec % PERIOD_SEC;
+  time_t ret = t->tv_sec / PERIOD_SEC;
+// printf("%ld\n", t->tv_sec);
+// printf("%d, %ld\n", value, ret);
+  if (value == 1 && (t->tv_usec != 0 || t->tv_sec %PERIOD_SEC != 0)) {
      ret += 1;
+  }
+// Note that series_length is called only if there is at least one element
+// In that series. Thus ignore the rounding down in this case.
+  if (ret == 0 ) {
+    return 1;
   }
   return ret;
 }
@@ -73,8 +75,8 @@ int main( int argc, char *argv[] )
   long            elapsed;
   int count;
   int prev_bit = 0;
-  samp_period.tv_sec = 0;
-  samp_period.tv_usec = SAMP_PERIOD;
+  samp_period.tv_sec = SAMP_PERIOD_SEC;
+  samp_period.tv_usec = SAMP_PERIOD_USEC;
 
   // Initialize our start times:
   gettime(&l_start);
@@ -108,6 +110,8 @@ int main( int argc, char *argv[] )
           // balance_timing tries to balance things out a little.
          // balance_timing(&h_diff, &l_diff);
 
+        //printf("h_diff: %ld\n", h_diff.tv_sec);
+        //printf("h_diff: %ld\n", h_diff.tv_usec);
           length = series_length(&h_diff, 1);
           for (count = 0; count < length; count++) {
             printf("1\n");
