@@ -16,9 +16,14 @@ void gettime(struct timeval *t) {
   }
 }
 
+int series_length(struct timeval *t) {
+ 
+}
+
 int main( int argc, char *argv[] )
 {
   struct timeval  l_start, h_start, h_end, curr, samp_period, diff;
+  struct timeval prevt;
   long            elapsed;
   int prev_bit = 0;
   samp_period.tv_sec = 0;
@@ -55,7 +60,9 @@ int main( int argc, char *argv[] )
           printf("h_diff: %ld\n", diff.tv_usec);
         }
         // Reset high_start time
-        gettime(&h_start);
+        //gettime(&h_start);
+        // set it to prevt to not ignore the time of the current read. 
+        h_start = prevt;
         // print the series of 0 bits.
         timersub(&curr, &l_start, &diff); 
         printf("l_diff: %ld\n", diff.tv_sec);
@@ -63,11 +70,12 @@ int main( int argc, char *argv[] )
       } 
     } else if(!bit && prevbit == 1) {
       // Case: falling edge
-      gettime(&h_end);
-      l_start = h_end;
+      h_end = curr;
+      l_start = curr;
     }
     usleep(10000); // To prevent overburdenning the channel from this end.
     prevbit = bit;
+    gettime(&prevt);
   } //end while
   return 0;
 }
