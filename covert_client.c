@@ -116,8 +116,8 @@ int main( int argc, char *argv[] )
         // set it to prevt to not ignore the time of the current read. 
         h_start = prevt;
         // print the series of 0 bits.
-        printf("l_diff: %ld\n", l_diff.tv_sec);
-        printf("l_diff: %ld\n", l_diff.tv_usec);
+        //printf("l_diff: %ld\n", l_diff.tv_sec);
+        //printf("l_diff: %ld\n", l_diff.tv_usec);
           length = series_length(&l_diff);
           for (count = 0; count < length; count++) {
             printf("0\n");

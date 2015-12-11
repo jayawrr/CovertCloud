@@ -101,8 +101,8 @@ void covert_write_bit( int value, long period )
     struct itimerval    timer, old_timer, empty_timer;
     struct sigaction    sa, old_sa;
 
-    /* For 1 bit, wait. */
-    if ( value )
+    /* For 0 bit, wait. */
+    if ( !value )
     {
         sleep( period / 1000000 );
         usleep( period % 1000000 );

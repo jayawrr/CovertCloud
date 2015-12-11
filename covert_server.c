@@ -13,7 +13,7 @@ int main( int argc, char *argv[] )
     for( i = 0; i < 100; i++ )
     {
         covert_write_bit( value ^= 1, 2050000 );
-        printf( "%d %d\n", i, value );
+        printf( "%d\n", value );
    }
 
     return 0;
