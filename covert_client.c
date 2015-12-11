@@ -51,12 +51,14 @@ int main( int argc, char *argv[] )
           // We also use this opportunity to print out the series of 1 bits
           // that preceded this series of 0 bits.
           timersub(&h_end, &h_start, &diff);
+          printf("h_diff: %ld\n", diff.tv_sec);
           printf("h_diff: %ld\n", diff.tv_usec);
         }
         // Reset high_start time
         gettime(&h_start);
         // print the series of 0 bits.
         timersub(&curr, &l_start, &diff); 
+        printf("l_diff: %ld\n", diff.tv_sec);
         printf("l_diff: %ld\n", diff.tv_usec);
       } 
     } else if(!bit && prevbit == 1) {
