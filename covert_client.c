@@ -108,7 +108,7 @@ int main( int argc, char *argv[] )
           // balance_timing tries to balance things out a little.
          // balance_timing(&h_diff, &l_diff);
 
-          length = series_length(&h_diff);
+          length = series_length(&h_diff, 1);
           for (count = 0; count < length; count++) {
             printf("1\n");
           }
@@ -120,7 +120,7 @@ int main( int argc, char *argv[] )
         // print the series of 0 bits.
         //printf("l_diff: %ld\n", l_diff.tv_sec);
         //printf("l_diff: %ld\n", l_diff.tv_usec);
-          length = series_length(&l_diff);
+          length = series_length(&l_diff, 0);
           for (count = 0; count < length; count++) {
             printf("0\n");
           }
