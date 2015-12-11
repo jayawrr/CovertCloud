@@ -21,7 +21,9 @@ void gettime(struct timeval *t) {
 }
 
 // Find out how many periods occur in the duration t:
-time_t series_length(struct timeval *t) {
+// Round up for 1s
+// Roudn down for 0s
+time_t series_length(struct timeval *t, int value) {
 // Ideally we would do division between timeval, but let's not bother for this.
 // Ugh, instead for now let's do the following:
 // With a period of 2 seconds, a samp_period of 2.3 seconds, 0bit periods 
@@ -30,7 +32,7 @@ time_t series_length(struct timeval *t) {
 // anything under 1 seconds.
   time_t mod = t->tv_sec % PERIOD_SEC;
   time_t ret = (t->tv_sec - mod) / PERIOD_SEC;
-  if (mod > 1) {
+  if (mod > 1 && value) {
      ret += 1;
   }
   return ret;
@@ -104,7 +106,7 @@ int main( int argc, char *argv[] )
           timersub(&h_end, &h_start, &h_diff);
           // Ther's a small bias towards l_diff
           // balance_timing tries to balance things out a little.
-          balance_timing(&h_diff, &l_diff);
+         // balance_timing(&h_diff, &l_diff);
 
           length = series_length(&h_diff);
           for (count = 0; count < length; count++) {
