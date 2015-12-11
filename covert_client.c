@@ -37,6 +37,8 @@ int main( int argc, char *argv[] )
     long ret = covert_read_time();
     if (ret > THRESHOLD) {
       bit = 1;
+    } else {
+      bit = 0;
     }
     gettime(&curr);
     if(bit && prevbit == 0) {
